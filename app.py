@@ -63,7 +63,7 @@ def predict():
         img = img.convert('L')
         img_array = np.array(img)
         img_array = img_array / 255.0
-        img_array = img_array.reshape(1, 28, 28, 1)
+        img_array = img_array.reshape(1,1,28,28)
 
         img_tensor = torch.from_numpy(img_array).float()
 
@@ -71,10 +71,11 @@ def predict():
             output = model(img_tensor)
             predicted_digit = torch.argmax(output, dim=1).item()
 
-        return jsonify({'prediction': str(predicted_digit)})
+        return jsonify({'prediction': str(predicted_digit), 'array': img_array.tolist()})
     except Exception as e:
         logging.error(f'Error during prediction: {str(e)}')
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     app.run(debug=True)
