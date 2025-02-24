@@ -5,21 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MNIST Digit Recognition</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        #dropZone {
+            width: 300px;
+            height: 200px;
+            border: 2px dashed #ccc;
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        #dropZone.dragover {
+            background: #e1e1e1;
+            border-color: #999;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
-        <form action="/predict" method="post" enctype="multipart/form-data" class="mt-4">
-            <div class="form-group">
-                <input type="file" name="file" accept="image/*" class="form-control-file">
+        <h4>Available Images:</h4>
+        <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
+            {% for image in images %}
+            <div>
+                <img src="/images/{{ image }}"
+                     alt="{{ image }}"
+                     style="width: 100px; height: 100px; margin: 10px;"
+                     onclick="handleImageClick(this.src)"
+                     draggable="true">
             </div>
-            <button type="submit" class="btn btn-primary">Predict</button>
-        </form>
+            {% endfor %}
+        </div>
+
+        <div id="dropZone">
+            Drop image here or click to upload
+            <input type="file" id="fileInput" style="display: none" accept="image/*">
+        </div>
         <div id="result" class="mt-4"></div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script>
-        $('form').on('submit', function(event) {
-            event.preventDefault();
-            var formData = new FormData(this);
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) processFile(file);
+        });
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) processFile(e.target.files[0]);
+        });
+
+        function processFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
             $.ajax({
                 url: '/predict',
                 type: 'POST',
@@ -33,7 +88,30 @@
                     $('#result').html('<h3 class="text-danger">Error occurred</h3>');
                 }
             });
-        });
+        }
+
+        function handleImageClick(imageSrc) {
+            fetch(imageSrc)
+                .then(response => response.blob())
+                .then(blob => {
+                    const formData = new FormData();
+                    formData.append('file', blob, 'image.jpg');
+
+                    $.ajax({
+                        url: '/predict',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(data) {
+                            $('#result').html('<h3>Prediction: ' + data.prediction + '</h3>');
+                        },
+                        error: function() {
+                            $('#result').html('<h3 class="text-danger">Error occurred</h3>');
+                        }
+                    });
+                });
+        }
     </script>
 </body>
 </html>
