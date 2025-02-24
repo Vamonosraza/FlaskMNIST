@@ -4,6 +4,7 @@ import torch.nn as nn
 import numpy as np
 from PIL import Image
 import os
+import logging
 from torchvision import transforms
 
 app = Flask(__name__)
@@ -22,7 +23,7 @@ class MNISTNet(nn.Module):
         x = self.fc2(x)
         return x
 
-# Load the trained model
+
 model = MNISTNet()
 model.load_state_dict(torch.load('mnist_model.pth', weights_only=True))
 model.eval()
@@ -57,12 +58,12 @@ def predict():
         return jsonify({'error': 'No selected file'}), 400
 
     try:
-        # Process the image file
         img = Image.open(file)
-        img = img.convert('L')  # Convert to grayscale if needed
+        img = img.resize((28, 28))
+        img = img.convert('L')
         img_array = np.array(img)
-        img_array = img_array / 255.0  # Normalize the image
-        img_array = img_array.reshape(1, 28, 28, 1)  # Reshape for the model
+        img_array = img_array / 255.0
+        img_array = img_array.reshape(1, 28, 28, 1)
 
         img_tensor = torch.from_numpy(img_array).float()
 
@@ -72,6 +73,7 @@ def predict():
 
         return jsonify({'prediction': str(predicted_digit)})
     except Exception as e:
+        logging.error(f'Error during prediction: {str(e)}')
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
