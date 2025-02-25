@@ -19,8 +19,8 @@
             border-color: #999;
         }
         #arrayContainer {
-            display: none;
-            margin-top: 20px;
+            margin-top:20px;
+            white-space: pre;
         }
     </style>
 </head>
@@ -94,12 +94,16 @@
                 contentType: false,
                 success: function(data) {
                     $('#result').html('<h3>Prediction: ' + data.prediction + '</h3>');
-                    arrayContent.textContent = JSON.stringify(data.array, null, 2);
+                    arrayContent.textContent = formatArray(data.array);
                 },
                 error: function() {
                     $('#result').html('<h3 class="text-danger">Error occurred</h3>');
                 }
             });
+        }
+
+        function formatArray(array){
+            return JSON.stringify(array)
         }
 
         function toggleArray(){
@@ -127,7 +131,7 @@
                         contentType: false,
                         success: function(data) {
                             $('#result').html('<h3>Prediction: ' + data.prediction + '</h3>');
-                            arrayContent.textContent = JSON.stringify(data.array, null, 2);
+                            arrayContent.textContent = JSON.stringify(data.array);
                         },
                         error: function() {
                             $('#result').html('<h3 class="text-danger">Error occurred</h3>');
