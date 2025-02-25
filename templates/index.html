@@ -6,6 +6,10 @@
     <title>MNIST Digit Recognition</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body{
+            background-color: #84bd84;
+            color: #212529;
+        }
         .image-container{
             display: flex;
             flex-direction: row;
@@ -48,7 +52,11 @@
 <body>
     <div class="container mt-5 text-center">
         <h1 class="display-1">MNIST Digital Model</h1>
+        <p class="">
+            This is a simple web application that uses a trained model to predict the digit in an image. The users can drag-and-drop or upload images of handwritten digits, which are then processed by a neural network model trained on the MNIST dataset. The model predicts the digit (one at a time) in the image and returns the predicted result to the user. The neural network model was trained on the MNIST dataset, which consists of 60,000 training images and 10,000 test images grey scale handwritten digits, to recognize and classify these digits accurately. Real world examples of similar models include Mail Sorting Systems, license plate readers, and digitization of historical documents.
+        </p>
     </div>
+
     <div class="container mt-5">
         <h4>Available Image Samples:</h4>
         <div class="image-container">
@@ -72,9 +80,15 @@
         <div id="result" class="mt-4"></div>
         <button id="expandButton" class="btn btn-primary mt-3" onclick="toggleArray()">Show What the Model sees</button>
         <div id="arrayContainer" class="mt-3">
+            <pre id="arrayText"></pre>
             <pre id="arrayContent"></pre>
         </div>
     </div>
+
+    <footer class="container mt-5 text-center">
+        <p>Want to learn more about the MNIST dataset? <a href="https://www.geeksforgeeks.org/mnist-dataset/" target="_blank">Click Here</a> </p>
+
+    </footer>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script>
@@ -83,6 +97,7 @@
         const arrayContainer = document.getElementById('arrayContainer');
         const arrayContent = document.getElementById('arrayContent');
         const expandButton = document.getElementById('expandButton');
+        const arrayText = document.getElementById('arrayText');
 
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
@@ -136,6 +151,7 @@
             if (arrayContainer.style.display === 'none') {
                 arrayContainer.style.display = 'block';
                 expandButton.innerText = 'Hide What the Model sees';
+                arrayText.textContent = 'The array represent the pixel values after the image is converted to a 28x28 grayscale image and normalized to a range of 0 to 1.';
             } else {
                 arrayContainer.style.display = 'none';
                 expandButton.innerText = 'Show What the Model sees';
